@@ -26,11 +26,8 @@ const HomePage: React.FC = () => {
 
   const handleToggleFavorite = (id: number, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isFavorite(id)) {
-      removeFavorite(id);
-    } else {
-      addFavorite(id);
-    }
+    if (isFavorite(id)) removeFavorite(id);
+    else addFavorite(id);
   };
 
   useEffect(() => {
@@ -87,7 +84,7 @@ const HomePage: React.FC = () => {
         }}
       >
         {movies.map((movie) => (
-          <div key={movie.id} onClick={() => {}}>
+          <div key={movie.id}>
             <MovieCard
               id={movie.id}
               title={movie.title}
