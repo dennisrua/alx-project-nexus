@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import styled from 'styled-components';
 import { useFavorites } from '@/hooks/useFavorites';
 
@@ -37,7 +38,9 @@ const Date = styled.p`
   color: #666;
 `;
 
-const FavButton = styled.button<{ favorited: boolean }>`
+const FavButton = styled.button.withConfig({
+  shouldForwardProp: (prop) => prop !== 'favorited',
+})<{ favorited: boolean }>`
   background-color: ${({ favorited }) => (favorited ? '#ff4d4f' : '#ccc')};
   color: #fff;
   border: none;
@@ -58,12 +61,13 @@ const MovieCard: React.FC<MovieCardProps> = ({
   poster_path,
   release_date,
 }) => {
+  const router = useRouter();
   const { isFavorite, addFavorite, removeFavorite } = useFavorites();
 
   const favorited = isFavorite(id);
 
   const toggleFavorite = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
+    e.stopPropagation(); // prevents the card click from firing
     if (favorited) {
       removeFavorite(id);
     } else {
@@ -71,8 +75,12 @@ const MovieCard: React.FC<MovieCardProps> = ({
     }
   };
 
+  const goToMovie = () => {
+    router.push(`/movies/${id}`);
+  };
+
   return (
-    <Card>
+    <Card onClick={goToMovie}>
       <Image
         src={`https://image.tmdb.org/t/p/w500${poster_path}`}
         alt={title}

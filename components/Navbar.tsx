@@ -1,15 +1,14 @@
 'use client';
 
 import React from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import Link from 'next/link';
 
 interface NavbarProps {
   toggleTheme: () => void;
-  theme: 'light' | 'dark';
 }
 
-const Nav = styled.nav<{ $themeMode: 'light' | 'dark' }>`
+const Nav = styled.nav`
   position: fixed;
   top: 0;
   left: 0;
@@ -18,9 +17,8 @@ const Nav = styled.nav<{ $themeMode: 'light' | 'dark' }>`
   justify-content: space-between;
   align-items: center;
   padding: 0.5rem 2rem;
-  background-color: ${({ $themeMode }) =>
-    $themeMode === 'light' ? '#f5f5f5' : '#1a1a1a'};
-  color: ${({ $themeMode }) => ($themeMode === 'light' ? '#000' : '#fff')};
+  background-color: ${({ theme }) => theme.bg};
+  color: ${({ theme }) => theme.text};
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -38,8 +36,8 @@ const NavLinks = styled.div`
   font-weight: 500;
 `;
 
-const StyledLink = styled(Link)<{ $themeMode: 'light' | 'dark' }>`
-  color: ${({ $themeMode }) => ($themeMode === 'light' ? '#000' : '#fff')};
+const StyledLink = styled(Link)`
+  color: ${({ theme }) => theme.text};
   text-decoration: none;
   transition: opacity 0.2s ease;
 
@@ -48,36 +46,32 @@ const StyledLink = styled(Link)<{ $themeMode: 'light' | 'dark' }>`
   }
 `;
 
-const Button = styled.button<{ $themeMode: 'light' | 'dark' }>`
+const Button = styled.button`
   padding: 0.5rem 1rem;
-  background-color: ${({ $themeMode }) =>
-    $themeMode === 'light' ? '#000' : '#fff'};
-  color: ${({ $themeMode }) => ($themeMode === 'light' ? '#fff' : '#000')};
+  background-color: ${({ theme }) => theme.text};
+  color: ${({ theme }) => theme.bg};
   border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease, color 0.3s ease;
 `;
 
-const Navbar: React.FC<NavbarProps> = ({ toggleTheme, theme }) => {
+const Navbar: React.FC<NavbarProps> = ({ toggleTheme }) => {
+  const theme = useTheme();
+
   return (
-    <Nav $themeMode={theme}>
-      <StyledLink href="/" $themeMode={theme}>
+    <Nav>
+      <StyledLink href="/">
         <Logo src="/logo.png" alt="AstraWatch" />
       </StyledLink>
 
       <NavLinks>
-        <StyledLink href="/" $themeMode={theme}>
-          Home
-        </StyledLink>
-
-        <StyledLink href="/favorites" $themeMode={theme}>
-          Favorites
-        </StyledLink>
+        <StyledLink href="/">Home</StyledLink>
+        <StyledLink href="/favorites">Favorites</StyledLink>
       </NavLinks>
 
-      <Button onClick={toggleTheme} $themeMode={theme}>
-        {theme === 'light' ? 'Dark' : 'Light'} Mode
+      <Button onClick={toggleTheme}>
+        {theme.bg === '#fff' ? 'Dark' : 'Light'} Mode
       </Button>
     </Nav>
   );
