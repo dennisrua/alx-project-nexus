@@ -1,9 +1,12 @@
-// components/MovieCard.tsx
+'use client';
+
 import React from 'react';
 import Image from 'next/image';
 import styled from 'styled-components';
+import { useFavorites } from '@/hooks/useFavorites';
 
 interface MovieCardProps {
+  id: number;
   title: string;
   poster_path: string;
   release_date: string;
@@ -34,11 +37,40 @@ const Date = styled.p`
   color: #666;
 `;
 
+const FavButton = styled.button<{ favorited: boolean }>`
+  background-color: ${({ favorited }) => (favorited ? '#ff4d4f' : '#ccc')};
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 0.25rem 0.5rem;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
+`;
+
 const MovieCard: React.FC<MovieCardProps> = ({
+  id,
   title,
   poster_path,
   release_date,
 }) => {
+  const { isFavorite, addFavorite, removeFavorite } = useFavorites();
+
+  const favorited = isFavorite(id);
+
+  const toggleFavorite = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    if (favorited) {
+      removeFavorite(id);
+    } else {
+      addFavorite(id);
+    }
+  };
+
   return (
     <Card>
       <Image
@@ -49,6 +81,9 @@ const MovieCard: React.FC<MovieCardProps> = ({
       />
       <Title>{title}</Title>
       <Date>{release_date}</Date>
+      <FavButton favorited={favorited} onClick={toggleFavorite}>
+        {favorited ? 'Unfavorite' : 'Favorite'}
+      </FavButton>
     </Card>
   );
 };

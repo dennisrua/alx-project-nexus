@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import MovieCard from '../components/MovieCard';
 import Navbar from '../components/Navbar';
 import { fetchTrendingMovies } from '../utils/tmdb';
-import Link from 'next/link';
+import { useFavorites } from '@/hooks/useFavorites';
 
 interface Movie {
   id: number;
@@ -18,15 +18,31 @@ const HomePage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
+  const { addFavorite, removeFavorite, isFavorite } = useFavorites();
+
   const toggleTheme = () => {
     setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
   };
 
+  const handleToggleFavorite = (id: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isFavorite(id)) {
+      removeFavorite(id);
+    } else {
+      addFavorite(id);
+    }
+  };
+
   useEffect(() => {
     const getMovies = async () => {
-      const data = await fetchTrendingMovies();
-      setMovies(data);
-      setLoading(false);
+      try {
+        const data = await fetchTrendingMovies();
+        setMovies(data);
+      } catch (err) {
+        console.error('Failed to fetch trending movies', err);
+      } finally {
+        setLoading(false);
+      }
     };
     getMovies();
   }, []);
@@ -71,13 +87,31 @@ const HomePage: React.FC = () => {
         }}
       >
         {movies.map((movie) => (
-          <Link key={movie.id} href={`/movies/${movie.id}`}>
+          <div key={movie.id} onClick={() => {}}>
             <MovieCard
+              id={movie.id}
               title={movie.title}
               poster_path={movie.poster_path}
               release_date={movie.release_date}
             />
-          </Link>
+            <button
+              style={{
+                marginTop: '0.5rem',
+                width: '100%',
+                padding: '0.25rem 0',
+                backgroundColor: isFavorite(movie.id) ? '#ff4444' : '#888',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer',
+              }}
+              onClick={(e) => handleToggleFavorite(movie.id, e)}
+            >
+              {isFavorite(movie.id)
+                ? 'Remove from Favorites'
+                : 'Add to Favorites'}
+            </button>
+          </div>
         ))}
       </div>
     </div>
